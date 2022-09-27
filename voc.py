@@ -66,9 +66,9 @@ class GetBBoxAndLabel(object):
                 bndbox.append(axis_value)
 
             label_idx = self.classes.index(name)
-            bndbox.appen(label_idx)
+            bndbox.append(label_idx)
 
             annotation += [bndbox]
         return np.array(annotation)
-        
+
 
