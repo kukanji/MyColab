@@ -71,8 +71,11 @@ class GetBBoxAndLabel(object):
             annotation += [bndbox]
         return np.array(annotation)
 
-from object_detection import augmentations
-from object_detection import Compose, ConvertFromInts, ToAbsoluteCoords, \
+
+import sys
+ROOT_PATH = '/content/drive/MyDrive/MyColab/object_detection'
+sys.path.append(ROOT_PATH)
+from augmentations import Compose, ConvertFromInts, ToAbsoluteCoords, \
     PhotometricDistort, Expand, RandomSampleCrop, \
         RandomMirror, ToPercentCoords, Resize, SubtractMeans
 
@@ -91,9 +94,16 @@ class DataTransform(object):
                 ToPercentCoords(),
                 Resize(input_size),
                 SubtractMeans(color_mean)
+            ]),
+            'val': Compose([
+                ConvertFromInts(),
+                Resize(input_size),
+                SubtractMeans(color_mean)
             ])
         }
     
     def __call__(self, img, phase, boxes, labels):
 
         return self.transform[phase](img, boxes, labels) 
+
+

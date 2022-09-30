@@ -198,8 +198,8 @@ class SubtractMeans(object):
         return image.astype(np.float32), boxes, labels
         
 def intersect(box_a, box_b):
-    max_xy = np.minimum(box_a[:, 2:], box_b[:, 2:])
-    min_xy = np.maximum(box_a[:, :2], box_b[:, :2])
+    max_xy = np.minimum(box_a[:, 2:], box_b[2:])
+    min_xy = np.maximum(box_a[:, :2], box_b[:2])
     inter = np.clip((max_xy - min_xy), a_min = 0, a_max = np.inf)
     return inter[:, 0] * inter[:, 1]
 
@@ -212,7 +212,7 @@ def jaccard_numpy(box_a, box_b):
     union = area_a + area_b - inter
     return inter / union
     
-class RandomSmpleCrop(object):
+class RandomSampleCrop(object):
 
     def __init__(self):
         self.sample_options = (
