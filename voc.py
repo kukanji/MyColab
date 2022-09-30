@@ -162,8 +162,6 @@ def multiobject_collate_fn(batch):
         imgs.append(sample[0])
         targets.append(torch.FloatTensor(sample[1]))
         
-    img = torch.stack(imgs, dim = 0)
+    imgs = torch.stack(imgs, dim = 0)
 
     return imgs, targets
-
-    
