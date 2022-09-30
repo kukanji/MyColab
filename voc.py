@@ -152,4 +152,18 @@ class PreprocessVOC2012(data.Dataset):
             (boxes, np.expand_dims(labels, axis = 1))
         )
         return img, boxlbl, height, width
+
+def multiobject_collate_fn(batch):
+
+    imgs = []
+    targets = []
+
+    for sample in batch:
+        imgs.append(sample[0])
+        targets.append(torch.FloatTensor(sample[1]))
         
+    img = torch.stack(imgs, dim = 0)
+
+    return imgs, targets
+
+    
