@@ -1,4 +1,3 @@
-from tkinter.ttk import _Padding
 import torch.nn as nn
 
 def make_vgg():
