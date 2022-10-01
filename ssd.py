@@ -155,7 +155,7 @@ class DBox(object):
                     mean += [cx, cy, s_k * sqrt(ar), s_k / sqrt(ar)]
                     mean += [cx, cy, s_k / sqrt(ar), s_k * sqrt(ar)]
 
-        output = torch.Tensor(mean.view(-1, 4))
+        output = torch.Tensor(mean).view(-1, 4)
         output.clamp_(max = 1, min = 0)
 
         return output
