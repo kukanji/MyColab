@@ -1,3 +1,4 @@
+from tkinter.ttk import _Padding
 import torch.nn as nn
 
 def make_vgg():
@@ -31,4 +32,27 @@ def make_vgg():
                 conv6, nn.ReLU(inplace=True),
                 conv7, nn.ReLU(inplace=True)]
      
+    return nn.ModuleList(layers)
+
+
+def make_extras():
+    layers = []
+    in_channels = 1024
+    cfg = [256, 512,
+           128, 256,
+           128, 256,
+           128, 256]
+
+    layers += [nn.Conv2(in_channels, cfg[0], kernel_size = (1))]
+    layers += [nn.Conv2(cfg[0], cfg[1], kernel_size = (3), stride = 2, padding = 1)]
+    
+    layers += [nn.Conv2(cfg[1], cfg[2], kernel_size = (1))]
+    layers += [nn.Conv2(cfg[2], cfg[3], kernel_size = (3), stride = 2, padding = 1)]
+
+    layers += [nn.Conv2(cfg[3], cfg[4], kernel_size = (1))]
+    layers += [nn.Conv2(cfg[4], cfg[5], kernel_size = (3))]
+    
+    layers += [nn.Conv2(cfg[5], cfg[6], kernel_size = (1))]
+    layers += [nn.Conv2(cfg[6], cfg[7], kernel_size = (3))]
+    
     return nn.ModuleList(layers)
