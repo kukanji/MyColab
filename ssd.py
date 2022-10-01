@@ -74,4 +74,21 @@ def make_loc(dbox_num = [4, 6, 6, 6, 4, 4]):
 
     return nn.ModuleList(loc_layers)
 
+
+def make_conf(classes_num = 21, dbox_num = [4, 6, 6, 6, 4, 4]):
+
+    conf_layers = []
+
+    conf_layers += [nn.Conv2d(512, dbox_num[0] * classes_num, kernel_size=3, padding=1)]
     
+    conf_layers += [nn.Conv2d(1024, dbox_num[1] * classes_num, kernel_size=3, padding=1)]
+    
+    conf_layers += [nn.Conv2d(512, dbox_num[2] * classes_num, kernel_size=3, padding=1)]
+    
+    conf_layers += [nn.Conv2d(256, dbox_num[3] * classes_num, kernel_size=3, padding=1)]
+    
+    conf_layers += [nn.Conv2d(256, dbox_num[4] * classes_num, kernel_size=3, padding=1)]
+    
+    conf_layers += [nn.Conv2d(256, dbox_num[5] * classes_num, kernel_size=3, padding=1)]
+
+    return nn.ModuleList(conf_layers)
