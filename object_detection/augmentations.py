@@ -1,4 +1,3 @@
-from locale import MON_2
 import cv2
 import numpy as np
 from numpy import random
