@@ -1,4 +1,6 @@
 import torch.nn as nn
+import torch
+import torch.nn.init as init
 
 def make_vgg():
     layers = []
@@ -92,3 +94,28 @@ def make_conf(classes_num = 21, dbox_num = [4, 6, 6, 6, 4, 4]):
     conf_layers += [nn.Conv2d(256, dbox_num[5] * classes_num, kernel_size=3, padding=1)]
 
     return nn.ModuleList(conf_layers)
+
+
+class L2Norm(nn.Module):
+    
+    def __init__(self, input_channels = 512, scale = 20):
+
+        super(L2Norm, self).__init__()
+        self.weight = nn.Parameter(torch.tensor(input_channels))
+        self.scale = scale
+        self.reset_parameters()
+        self.eps = 1e-10
+
+    def reset_parameters(self):
+        
+        init.constant_(self.weight, self.scale)
+
+    def forward(self, x):
+
+        norm = x.pow(2).sum(dim = 1, keepdim = True).sqrt() + self.eps
+        x = torch.div(x, norm)
+
+        weights = self.weight.unsqueeze(0).unsqueeze(2).unsqueeze(3).expand_as(x)
+        out = weights * x
+
+        return out
