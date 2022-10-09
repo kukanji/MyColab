@@ -4,6 +4,7 @@ import torch.nn.init as init
 from itertools import product as product
 from math import sqrt as sqrt
 from torch.autograd import Function
+import torch.nn.functional as F
 
 def make_vgg():
     layers = []
@@ -279,3 +280,66 @@ class Detect(Function):
                 output[i, cl, :count] = torch.cat((scores[ids[:count]].unsqueeze(1),boxes[ids[:count]]), 1)
 
         return output
+
+#ssdクラスを作成する
+class SSD(nn.Module):
+
+    def __init__(self, phase, cfg):
+
+        super(SSD, self).__init__()
+
+        self.phase = phase
+        self.classes_num = cfg['classes_num']
+
+        self.vgg = make_vgg()
+        self.extras = make_extras()
+        self.L2Norm = L2Norm()
+        self.loc = make_loc(cfg['dbox_num'])
+        self.conf = make_conf(cfg['classes_num'], cfg['dbox_num'])
+        
+        dbox = DBox(cfg)
+        self.dbox_list = dbox.make_dbox_list()
+
+        if phase == 'test':
+            self.detect = Detect.apply
+
+    def forward(self, x):
+        
+        out_list = list()
+        loc = list()
+        conf = list()
+
+        for k in range(23):
+            x = self.vgg[k](x)
+        out1 = self.L2Norm(x)
+        out_list.append(out1)
+
+        for k in range(23, len(self.vgg)):
+            x = self.vgg[k](x)
+        out_list.append(x)
+
+        for k, v in enumerate(self.extras):
+            x = F.relu(v(x), inplace=True)
+            if k % 2 == 1:
+                out_list.append(x)
+
+        for (x, l, c) in zip(out_list, self.loc, self.conf):
+            loc.append(l(x).permute(0, 2, 3, 1).contiguous())
+            conf.append(c(x).permute(0, 2, 3, 1).contiguous())
+        loc = torch.cat([o.view(o.size(0), -1) for o in loc], 1)
+        conf = torch.cat([o.view(o.size(0), -1) for o in conf], 1)         
+
+        loc = loc.view((loc.size(0), -1, 4))
+        conf = conf.view((conf.size(0), -1, self.classes_num))
+
+        output = (loc, conf, self.dbox_list)
+
+        if self.phase =='test':
+            
+            return self.detect(output[0], output[1], output[2])
+
+        else:
+            
+            return output
+
+        
