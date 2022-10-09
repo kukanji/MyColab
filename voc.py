@@ -5,9 +5,6 @@ import sys
 import torch
 import torch.utils.data as data
 import cv2
-
-ROOT_PATH = '/content/drive/MyDrive/MyColab/object_detection'
-sys.path.append(ROOT_PATH)
 from augmentations import Compose, ConvertFromInts, ToAbsoluteCoords, \
     PhotometricDistort, Expand, RandomSampleCrop, \
         RandomMirror, ToPercentCoords, Resize, SubtractMeans
