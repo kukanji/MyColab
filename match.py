@@ -30,3 +30,32 @@ def jaccard(box_a, box_b):
     area_b = ((box_b[:, 2] - box_b[:, 0]) * (box_b[:, 3] - box_b[:, 1])).unsqueeze(0).expand_as(inter)
     union = area_a + area_b - inter
     return inter / union
+
+#教師データloc, confを作成する関数
+def match(threshold, truths, priors, variances, labels, loc_t, conf_t, idx):
+    overlaps = jaccard(
+        truths,
+        point_form(priors)
+    )
+    best_prior_overlap, best_prior_idx = overlaps.max(1, keepdim = True)
+    best_truth_overlap, best_truth_idx = overlaps.max(0, keepdim = True)
+    
+    best_truth_idx.squeeze_(0)
+    best_truth_overlap.squeeze_(0)
+    
+    best_prior_idx.squeeze_(1)
+    best_prior_overlap.squeeze_(1)
+
+    best_truth_overlap.index_fill_(0, best_prior_idx, 2)
+
+    for j in range(best_prior_idx.size(0)):
+        best_truth_idx[best_prior_idx[j]] = j
+        
+    matches = truths[best_prior_idx[j]] = j
+    conf = labels[best_truth_idx] + 1
+    conf[best_truth_overlap < threshold] = 0
+
+    loc = encode(matches, priors, variances)
+
+    loc_t[idx] = loc
+    conf_t[idx] = conf
